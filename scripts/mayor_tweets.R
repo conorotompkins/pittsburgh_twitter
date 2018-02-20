@@ -1,11 +1,16 @@
 library(tidyverse)
+library(httpuv)
+library(openssl)
+library(httr)
 library(rtweet)
+library(lubridate)
+
+theme_set(theme_bw(base_size = 18))
 
 #this script should open a popoup window where I authenticate with the API
 rt <- search_tweets(
   "#rstats", n = 18, include_rts = FALSE
 )
-
 
 ## get user IDs of accounts followed by CNN
 tmls <- get_timelines(c("cnn", "BBCWorld", "foxnews"), n = 3200)
@@ -27,3 +32,15 @@ tmls %>%
     subtitle = "Twitter status (tweet) counts aggregated by day from October/November 2017",
     caption = "\nSource: Data collected from Twitter's REST API via rtweet"
   )
+
+df_bill <- get_timelines("billpeduto", n = 3200)
+df_bill
+
+df_bill %>% 
+  filter(str_detect(text, "snow|ice|pothole")) %>% 
+  mutate(date = ymd(str_sub(created_at, 1, 10))) %>% 
+  count(date) %>% 
+  ggplot(aes(date, n)) +
+  geom_point() +
+  geom_smooth()
+
