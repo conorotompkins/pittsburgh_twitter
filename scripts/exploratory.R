@@ -1,4 +1,3 @@
-
 df_bill %>% 
   filter(str_detect(text, "snow|ice|pothole")) %>% 
   select(status_id, text)
