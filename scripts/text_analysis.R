@@ -25,3 +25,7 @@ bigram_graph <- bigram_counts %>%
   graph_from_data_frame()
 
 bigram_graph
+
+
+#citations
+#https://www.tidytextmining.com/ngrams.html
