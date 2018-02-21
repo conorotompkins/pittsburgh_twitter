@@ -44,3 +44,28 @@ df_bill %>%
   geom_point() +
   geom_smooth()
 
+
+
+
+
+
+
+
+
+
+
+
+
+###Citations
+#https://github.com/mkearney/rtweet
+#http://rtweet.info/
+#http://rtweet.info/articles/intro.html
+#https://stackoverflow.com/questions/47681690/no-twitter-authorization-prompt-when-using-rtweet-package/48275078#48275078
+#https://stackoverflow.com/questions/47910979/setting-up-rtweet-for-r-in-aws-ubuntu-server
+#https://github.com/r-lib/httr/issues/156
+#https://github.com/mkearney/rtweet/issues/75
+#https://github.com/geoffjentry/twitteR/issues/65
+#https://github.com/r-lib/httr/blob/master/demo/oauth1-twitter.r
+
+
+
