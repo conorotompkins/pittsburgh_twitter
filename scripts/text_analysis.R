@@ -4,6 +4,7 @@ library(ggraph)
 library(igraph)
 library(widyr)
 library(SnowballC)
+
 theme_set(theme_void())
 
 df_bill <- read_csv("data/bill_peduto_tweets.tweets.csv")
@@ -32,8 +33,7 @@ df_bigrams_separate
 df_bigrams_separate %>% 
   count(word1, word2, sort = TRUE) -> df_bigrams_counts
 
-df_bigrams_counts %>% 
-  filter(word1 == "reality")
+df_bigrams_counts
 
 bigram_graph <- df_bigrams_counts %>%
   filter(n > 2) %>%
