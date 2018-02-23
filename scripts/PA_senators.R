@@ -14,6 +14,9 @@ tweets_toomey <- get_timelines("SenToomey", n = 3200) %>%
 
 tweets <- bind_rows(tweets_casey, tweets_toomey)
 
+tweets %>% 
+  count(senator)
+
 replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
 unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
 tidy_tweets <- tweets %>% 
@@ -60,6 +63,7 @@ word_ratios <- tidy_tweets %>%
 word_ratios %>% 
   arrange(desc(abs(logratio)))
 
+#need to switch colors around
 word_ratios %>%
   group_by(logratio < 0) %>%
   top_n(15, abs(logratio)) %>%
@@ -71,3 +75,4 @@ word_ratios %>%
   ylab("log odds ratio (Casey/Toomey)") +
   scale_fill_discrete(name = "", labels = c("Casey", "Toomey"))
 
+#need to do network analysis for each senator
