@@ -1,38 +1,17 @@
-library(tidyverse)
-library(rtweet)
-library(lubridate)
+source("scripts/tidytext_functions.R")
 
-theme_set(theme_bw(base_size = 18))
+df_bill <- read_csv("data/bill_peduto_tweets.tweets.csv")
 
-#this script should open a popoup window where I authenticate with the API
-rt <- search_tweets(
-  "#rstats", n = 18, include_rts = FALSE
-)
+bill_stop_words <- c("t.co", "https", "amp")
+bill_replacer <- c("'s$")
 
-## get user IDs of accounts followed by CNN
-tmls <- get_timelines(c("cnn", "BBCWorld", "foxnews"), n = 3200)
+tweets_bill <- count_bigrams(df_bill, bill_stop_words, bill_replacer)
+tweets_bill
 
-## plot the frequency of tweets for each user over time
-tmls %>%
-  dplyr::filter(created_at > "2017-10-29") %>%
-  dplyr::group_by(screen_name) %>%
-  ts_plot("days", trim = 1L) +
-  ggplot2::geom_point() +
-  ggplot2::theme_minimal() +
-  ggplot2::theme(
-    legend.title = ggplot2::element_blank(),
-    legend.position = "bottom",
-    plot.title = ggplot2::element_text(face = "bold")) +
-  ggplot2::labs(
-    x = NULL, y = NULL,
-    title = "Frequency of Twitter statuses posted by news organization",
-    subtitle = "Twitter status (tweet) counts aggregated by day from October/November 2017",
-    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
-  )
-
-df_bill <- get_timelines("billpeduto", n = 3200)
-#save_as_csv(df_bill, "data/bill_peduto_tweets.csv")
-
+visualize_bigrams(tweets_bill, 3,
+                  title = "@BillPeduto tweets",
+                  subtitle = "Bigram network",
+                  caption = "@conor_tompkins")
 ###Citations
 #https://github.com/mkearney/rtweet
 #http://rtweet.info/
