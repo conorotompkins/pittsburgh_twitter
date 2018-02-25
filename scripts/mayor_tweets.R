@@ -1,5 +1,6 @@
 source("scripts/tidytext_functions.R")
 
+#tweets_bill <- get_timelines("BillPeduto", n = 3200)
 df_bill <- read_csv("data/bill_peduto_tweets.tweets.csv")
 
 bill_stop_words <- c("t.co", "https", "amp")
