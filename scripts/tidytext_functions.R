@@ -19,7 +19,20 @@ count_bigrams <- function(dataset, custom_stopwords, replacer) {
     count(word1, word2, sort = TRUE)
 }
 
-visualize_bigrams <- function(bigrams, minimum, title, subtitle, caption) {
+
+count_bigrams_basic <- function(dataset, custom_stopwords) {
+  dataset %>%
+    filter(is_quote == FALSE, is_retweet == FALSE) %>% 
+    unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+    separate(bigram, c("word1", "word2"), sep = " ") %>%
+    filter(!word1 %in% stop_words$word,
+           !word2 %in% stop_words$word,
+           !word1 %in% custom_stopwords,
+           !word2 %in% custom_stopwords) %>%
+    count(word1, word2, sort = TRUE)
+}
+
+visualize_bigrams <- function(bigrams, minimum, title = NULL, subtitle = NULL, caption = NULL) {
   set.seed(2016)
   a <- grid::arrow(type = "closed", 
                    length = unit(.1, "inches"))
