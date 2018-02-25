@@ -1,16 +1,22 @@
+library(tidyverse)
 library(lubridate)
 library(rtweet)
 library(scales)
 
 theme_set(theme_bw(base_size = 18))
 
-tweets_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
-  mutate(senator = "Casey")
-save_as_csv(tweets_casey, "data/tweets_casey.csv")
+#tweets_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
+#  mutate(senator = "Casey")
+
+#save_as_csv(tweets_casey, "data/tweets_casey.csv")
+tweets_casey <- read_csv("data/tweets_casey.tweets.csv")
 
 tweets_toomey <- get_timelines("SenToomey", n = 3200) %>% 
   mutate(senator = "Toomey")
-save_as_csv(tweets_casey, "data/tweets_toomey.csv")
+
+save_as_csv(tweets_toomey, "data/tweets_toomey.csv")
+tweets_toomey <- read_csv("data/tweets_toomey.tweets.csv")
+
 tweets <- bind_rows(tweets_casey, tweets_toomey)
 
 tweets %>% 
@@ -94,3 +100,10 @@ word_ratios %>%
 #need to do network analysis for each senator
 source("scripts/tidytext_functions.R")
 
+tweets_casey <- count_bigrams(tweets_casey)
+tweets_casey
+
+visualize_bigrams(tweets_bill, 3,
+                  title = "@BillPeduto tweets",
+                  subtitle = "Bigram network",
+                  caption = "@conor_tompkins")
