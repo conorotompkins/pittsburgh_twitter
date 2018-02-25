@@ -1,17 +1,16 @@
-library(tidyverse)
-library(rtweet)
 library(lubridate)
-library(tidytext)
+library(rtweet)
 library(scales)
 
 theme_set(theme_bw(base_size = 18))
 
 tweets_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
   mutate(senator = "Casey")
+save_as_csv(tweets_casey, "data/tweets_casey.csv")
 
 tweets_toomey <- get_timelines("SenToomey", n = 3200) %>% 
   mutate(senator = "Toomey")
-
+save_as_csv(tweets_casey, "data/tweets_toomey.csv")
 tweets <- bind_rows(tweets_casey, tweets_toomey)
 
 tweets %>% 
@@ -19,13 +18,27 @@ tweets %>%
 
 replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
 unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
+
+tweets %>% 
+  select(senator, status_id, text) %>% 
+  filter(!str_detect(text, "^RT")) %>%
+  mutate(text = str_replace_all(text, replace_reg, ""),
+         senator = factor(senator, levels = c("Toomey", "Casey"))) %>% 
+  count(senator)
+
 tidy_tweets <- tweets %>% 
   select(senator, status_id, text) %>% 
   filter(!str_detect(text, "^RT")) %>%
-  mutate(text = str_replace_all(text, replace_reg, "")) %>%
+  mutate(text = str_replace_all(text, replace_reg, ""),
+         senator = factor(senator, levels = c("Casey", "Toomey"))) %>%
   unnest_tokens(word, text, token = "regex", pattern = unnest_reg) %>%
   filter(!word %in% stop_words$word,
          str_detect(word, "[a-z]"))
+
+tidy_tweets
+sum(is.na(tidy_tweets$senator))
+tidy_tweets %>% 
+  filter(is.na(senator))
 
 frequency <- tidy_tweets %>% 
   group_by(senator) %>% 
@@ -39,7 +52,7 @@ frequency
 frequency <- frequency %>% 
   select(senator, word, freq) %>% 
   spread(senator, freq) %>%
-  arrange(Casey, Toomey)
+  arrange(desc(Casey), desc(Toomey))
 frequency
 
 ggplot(frequency, aes(Casey, Toomey)) +
@@ -70,9 +83,14 @@ word_ratios %>%
   ungroup() %>%
   mutate(word = reorder(word, logratio)) %>%
   ggplot(aes(word, logratio, fill = logratio < 0)) +
-  geom_col(show.legend = FALSE) +
+  geom_col(alpha = .8) +
   coord_flip() +
   ylab("log odds ratio (Casey/Toomey)") +
-  scale_fill_discrete(name = "", labels = c("Casey", "Toomey"))
+  scale_fill_manual(name = "", 
+                    values = c("blue", "red"),
+                    breaks = c(FALSE, TRUE), 
+                    labels = c("Casey", "Toomey"))
 
 #need to do network analysis for each senator
+source("scripts/tidytext_functions.R")
+
