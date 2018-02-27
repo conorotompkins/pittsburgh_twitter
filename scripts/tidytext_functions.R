@@ -5,13 +5,14 @@ library(igraph)
 library(widyr)
 library(SnowballC)
 
-count_bigrams <- function(dataset, custom_stopwords, replacer) {
+count_twitter_bigrams <- function(dataset, custom_stopwords) {
+  replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https|'s"
+  
   dataset %>%
     filter(is_quote == FALSE, is_retweet == FALSE) %>% 
+    mutate(text = str_replace_all(text, replace_reg, "")) %>%
     unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
     separate(bigram, c("word1", "word2"), sep = " ") %>%
-    mutate(word1 = str_replace(word1, replacer, ""),
-           word2 = str_replace(word2, replacer, "")) %>% 
     filter(!word1 %in% stop_words$word,
            !word2 %in% stop_words$word,
            !word1 %in% custom_stopwords,
@@ -44,8 +45,8 @@ visualize_bigrams <- function(bigrams, minimum, title = NULL, subtitle = NULL, c
     geom_node_point(color = "lightblue", size = 5) +
     geom_node_text(aes(label = name), size = 6, vjust = 1, hjust = 1) +
     geom_edge_link(aes(edge_alpha = n, edge_width = n), show.legend = TRUE, arrow = a, end_cap = circle(.25, 'inches')) +
-    scale_edge_width_continuous("Count", range = c(.1, .9)) +
-    scale_edge_alpha_continuous("Count", range = c(.3, .9)) +
+    scale_edge_width_continuous("Count", range = c(.1, 2)) +
+    scale_edge_alpha_continuous("Count", range = c(.3, .7)) +
     labs(title = title,
          subtitle = subtitle,
          caption = caption) +
