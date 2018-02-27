@@ -63,3 +63,5 @@ tweets_combined %>%
        caption = "caption") +
   theme_void(base_size = 18) +
   th_foreground(foreground = 'grey80', border = TRUE)
+
+#need to do correlation plots
