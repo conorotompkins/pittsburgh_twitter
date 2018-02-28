@@ -1,18 +1,31 @@
 source("scripts/tidytext_functions.R")
 
+set.seed(1234)
+
 #tweets_bill <- get_timelines("BillPeduto", n = 3200)
 df_bill <- read_csv("data/bill_peduto_tweets.tweets.csv")
 
 bill_stop_words <- c("t.co", "https", "amp")
-bill_replacer <- c("'s$")
 
-tweets_bill <- count_bigrams(df_bill, bill_stop_words, bill_replacer)
+tweets_bill <- count_twitter_bigrams(df_bill, bill_stop_words)
 tweets_bill
 
+#bigram network chart
 visualize_bigrams(tweets_bill, 3,
                   title = "@BillPeduto tweets",
                   subtitle = "Bigram network",
                   caption = "@conor_tompkins")
+
+#using the function
+bill_stop_words <- c("t.co", "https", "amp")
+bill_words <- word_correlations(df_bill, bill_stop_words)
+bill_words
+
+visualize_word_correlations(bill_words, 
+                            title = "@BillPeduto tweets",
+                            subtitle = "Word correlation network",
+                            caption = "@conor_tompkins")
+
 ###Citations
 #https://github.com/mkearney/rtweet
 #http://rtweet.info/
