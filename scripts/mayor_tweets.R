@@ -17,15 +17,14 @@ visualize_bigrams(tweets_bill, 3,
                   caption = "@conor_tompkins")
 
 #using the function
-bill_stop_words <- c("t.co", "https", "amp")
-bill_words <- word_correlations(df_bill, bill_stop_words)
-bill_words
+bill_stopwords <- c("t.co", "https", "amp")
+
+bill_words <- word_correlations(df_bill, 20, bill_stopwords)
 
 visualize_word_correlations(bill_words, 
                             title = "@BillPeduto tweets",
                             subtitle = "Word correlation network",
                             caption = "@conor_tompkins")
-
 ###Citations
 #https://github.com/mkearney/rtweet
 #http://rtweet.info/
