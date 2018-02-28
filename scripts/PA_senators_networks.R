@@ -14,9 +14,8 @@ df_toomey <- read_csv("data/tweets_toomey.tweets.csv")
 
 df_casey
 
-casey_stopwords <- c("0085")
+casey_stopwords <- c("0085", "009f", "f0", "00a6")
 casey_replacers <- c("'s")
-#add casey replacer for "'s"
 #need to get rid of "itâ€™s"
 tweets_casey <- count_twitter_bigrams(df_casey, custom_stopwords = casey_stopwords) %>% 
   mutate(senator = "Casey")
@@ -28,7 +27,7 @@ visualize_bigrams(tweets_casey, 15,
                   caption = "@conor_tompkins")
 
 #need to get rid of "amp" connected to "senbobcasey
-toomey_stopwords <- c("0085")
+toomey_stopwords <- c("0085", "009f", "f0", "00a6")
 tweets_toomey <- count_twitter_bigrams(df_toomey, custom_stopwords = toomey_stopwords) %>% 
   mutate(senator = "Toomey")
 tweets_toomey
@@ -41,7 +40,7 @@ visualize_bigrams(tweets_toomey, 15,
 #trying to create df of combined tweets so I can facet network graph by senator
 df_combined <- bind_rows(df_casey, df_toomey)
 df_combined
-combined_stopwords <- c("0085")
+combined_stopwords <- c("0085", "009f", "f0", "00a6")
 
 bind_rows(tweets_casey, tweets_toomey) -> tweets_combined
 tweets_combined
@@ -65,3 +64,14 @@ tweets_combined %>%
   th_foreground(foreground = 'grey80', border = TRUE)
 
 #need to do correlation plots
+casey_words <- word_correlations(df_casey, 75, casey_stopwords)
+visualize_word_correlations(casey_words, 
+                            title = "@SenBobCasey tweets",
+                            subtitle = "Word correlation",
+                            caption = "@conor_tompkins")
+
+toomey_words <- word_correlations(df_toomey, 75, casey_stopwords)
+visualize_word_correlations(toomey_words, 
+                            title = "@SenToomey tweets",
+                            subtitle = "Word correlation",
+                            caption = "@conor_tompkins")
