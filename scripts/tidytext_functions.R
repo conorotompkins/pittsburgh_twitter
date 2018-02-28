@@ -67,7 +67,8 @@ word_correlations <- function(dataframe, minimum, custom_stopwords){
          !word %in% custom_stopwords,
          str_detect(word, "[a-z]")) %>% 
   mutate(word = str_replace(word, "'", ""),
-         word = str_replace(word, "’", "")) %>% 
+         word = str_replace(word, "’", ""),
+         word = SnowballC::wordStem(word)) %>% 
   group_by(word) %>% 
   filter(n() >= minimum) %>%
   pairwise_cor(word, section, sort = TRUE)
