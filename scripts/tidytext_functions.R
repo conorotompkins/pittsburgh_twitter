@@ -53,7 +53,7 @@ visualize_bigrams <- function(bigrams, minimum, title = NULL, subtitle = NULL, c
     theme_void(base_size = 18)
 }
 
-word_correlations <- function(dataframe, custom_stopwords){
+word_correlations <- function(dataframe, minimum, custom_stopwords){
   replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
   unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
   dataframe %>% 
@@ -70,7 +70,7 @@ word_correlations <- function(dataframe, custom_stopwords){
          word = str_replace(word, "’", ""),
          word = wordStem(word)) %>% 
   group_by(word) %>%
-  filter(n() >= 20) %>%
+  filter(n() >= minimum) %>%
   pairwise_cor(word, section, sort = TRUE)
   }
 #replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
