@@ -91,7 +91,7 @@ visualize_word_correlations <- function(dataframe, title, subtitle, caption){
   geom_node_point(color = "lightblue", size = 5) +
   geom_node_label(aes(label = name), size = 5, repel = FALSE) +
   scale_edge_alpha_continuous(range = c(.1, .5)) +
-  theme_void() +
+  theme_void(base_size = 18) +
   labs(title = title,
        subtitle = subtitle,
        caption = caption)
