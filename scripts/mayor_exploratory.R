@@ -18,32 +18,47 @@ df_bill %>%
   count(date) %>%
   ggplot(aes(date, n)) +
   geom_point() +
-  geom_smooth()
+  geom_smooth() +
+  labs(x = "",
+       y = "Number of tweets")
 
 df_bill %>% 
   count(date, is_quote) %>% 
   ggplot(aes(date, n, color = is_quote)) +
   geom_point(alpha = .2) +
-  geom_smooth()
+  geom_smooth() +
+  labs(x = "",
+       y = "Number of tweets") +
+  scale_color_discrete(name = "", labels = c("Not a quote tweet", "Quote tweet"))
 
 df_bill %>% 
   count(date, is_retweet) %>% 
   ggplot(aes(date, n, color = is_retweet)) +
   geom_point(alpha = .2) +
-  geom_smooth()
+  geom_smooth() +
+  labs(x = "",
+       y = "Number of tweets") +
+  scale_color_discrete(name = "", labels = c("Not a retweet", "Retweet"))
   
 df_bill %>% 
   ggplot(aes(hour)) +
   geom_freqpoly(bins = 20) +
-  coord_cartesian(xlim = c(0, 23))
+  coord_cartesian(xlim = c(0, 23)) +
+  labs(x = "Hour",
+       y = "Number of tweets")
 
 df_bill %>% 
   ggplot(aes(hour)) +
-  geom_density()
+  geom_density() +
+  labs(x = "Hour",
+       y = "Density of tweets")
 
 df_bill %>% 
   ggplot(aes(wday)) +
-  geom_bar()
+  geom_bar() +
+  labs(x = "",
+       y = "Number of tweets") +
+  scale_y_continuous(expand = c(.01,0))
 
 df_bill %>% 
   count(wday, hour) %>% 
@@ -55,7 +70,10 @@ df_bill %>%
   scale_y_reverse(expand = c(0,0),
                   breaks = seq(0, 24, by = 3)) +
   scale_x_discrete(expand = c(0,0)) +
-  scale_fill_viridis(option = 3)
+  scale_fill_viridis(option = 3) +
+  labs(x = "",
+       y = "Hour") +
+  guides(fill = guide_colorbar("Number of tweets"))
   
 
 
