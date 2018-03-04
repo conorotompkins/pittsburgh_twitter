@@ -43,6 +43,7 @@ df_bill %>%
 df_bill %>% 
   ggplot(aes(hour)) +
   geom_freqpoly(bins = 20) +
+  scale_x_continuous(breaks = seq(0, 23, by = 4)) +
   coord_cartesian(xlim = c(0, 23)) +
   labs(x = "Hour",
        y = "Number of tweets")
