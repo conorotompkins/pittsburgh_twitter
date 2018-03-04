@@ -24,6 +24,7 @@ df %>%
          month_year = factor(month_year, levels = unique(month_year)),
          wday = factor(wday, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))) -> df_bill
 df_bill
+str(df_bill)
 #write_csv(df_bill, "data/df_billpeduto.csv")
 
 df_bill %>% 
@@ -31,6 +32,8 @@ df_bill %>%
   ggplot(aes(date, n)) +
   geom_jitter(alpha = .5) +
   geom_smooth(size = 2) +
+  scale_x_date(date_breaks = "month",
+               date_labels = "%b-%Y") +
   labs(title = title, 
        x = "",
        y = "Number of tweets",
