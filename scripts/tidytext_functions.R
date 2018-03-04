@@ -43,7 +43,7 @@ visualize_bigrams <- function(bigrams, minimum, title = NULL, subtitle = NULL, c
     graph_from_data_frame() %>%
     ggraph(layout = "fr") +
     geom_node_point(color = "lightblue", size = 3) +
-    geom_node_text(aes(label = name), size = 4, vjust = 1, hjust = 1) +
+    geom_node_text(aes(label = name), size = 1, vjust = 1, hjust = 1) +
     geom_edge_link(aes(edge_alpha = n, edge_width = n), show.legend = TRUE, arrow = a, end_cap = circle(.25, 'inches')) +
     scale_edge_width_continuous("Count", range = c(.5, 2)) +
     scale_edge_alpha_continuous("Count", range = c(.3, .7)) +
