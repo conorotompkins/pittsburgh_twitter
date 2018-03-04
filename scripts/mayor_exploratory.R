@@ -24,6 +24,7 @@ df %>%
          month_year = factor(month_year, levels = unique(month_year)),
          wday = factor(wday, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))) -> df_bill
 df_bill
+#write_csv(df_bill, "data/df_billpeduto.csv")
 
 df_bill %>% 
   count(date) %>%
