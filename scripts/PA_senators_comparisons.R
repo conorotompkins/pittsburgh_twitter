@@ -23,23 +23,23 @@ tweets <- bind_rows(tweets_casey, tweets_toomey)
 tweets %>% 
   count(senator)
 
-replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
+replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https|'s|'"
 unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
 
 tweets %>% 
-  select(senator, status_id, text) %>% 
-  filter(!str_detect(text, "^RT")) %>%
+  select(senator, status_id, text, is_quote, is_retweet) %>% 
+  filter(is_quote == FALSE, is_retweet == FALSE) %>% 
   mutate(text = str_replace_all(text, replace_reg, ""),
          senator = factor(senator, levels = c("Toomey", "Casey"))) %>% 
   count(senator)
 
 tidy_tweets <- tweets %>% 
-  select(senator, status_id, text) %>% 
-  filter(!str_detect(text, "^RT")) %>%
+  select(senator, status_id, text, is_quote, is_retweet) %>% 
   mutate(text = str_replace_all(text, replace_reg, ""),
          senator = factor(senator, levels = c("Casey", "Toomey"))) %>%
   unnest_tokens(word, text, token = "regex", pattern = unnest_reg) %>%
   filter(!word %in% stop_words$word,
+         !word %in% c("009f", "00a6", "f0"),
          str_detect(word, "[a-z]"))
 
 tidy_tweets
