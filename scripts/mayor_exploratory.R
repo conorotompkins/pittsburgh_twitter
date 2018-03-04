@@ -12,7 +12,7 @@ df <- read_csv("data/bill_peduto_tweets.tweets.csv")
 
 df %>% 
   arrange(created_at) %>% 
-  select(status_id, text, created_at, source, is_quote, is_retweet, display_text_width, favorite_count, reply_to_screen_name) %>% 
+  select(status_id, created_at, source, is_quote, is_retweet, display_text_width, favorite_count, reply_to_screen_name) %>% 
   mutate(created_at = with_tz(created_at, "US/Eastern"),
          date = ymd(str_sub(created_at, 1, 10)),
          year = year(date),
