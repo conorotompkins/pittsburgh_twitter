@@ -64,14 +64,16 @@ tweets_combined %>%
   th_foreground(foreground = 'grey80', border = TRUE)
 
 #need to do correlation plots
-casey_words <- word_correlations(df_casey, 75, casey_stopwords)
+casey_words <- word_correlations(df_casey, minimum = 75, casey_stopwords)
 visualize_word_correlations(casey_words, 
+                            minimum_correlation = .2,
                             title = "@SenBobCasey tweets",
                             subtitle = "Word correlation",
                             caption = "@conor_tompkins")
 
-toomey_words <- word_correlations(df_toomey, 75, casey_stopwords)
+toomey_words <- word_correlations(df_toomey, minimum = 75, casey_stopwords)
 visualize_word_correlations(toomey_words, 
+                            minimum_correlation = .2,
                             title = "@SenToomey tweets",
                             subtitle = "Word correlation",
                             caption = "@conor_tompkins")
