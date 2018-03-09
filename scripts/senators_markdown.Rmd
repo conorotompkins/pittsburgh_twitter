@@ -1,0 +1,220 @@
+---
+title: "Comparing Senators Casey and Toomey"
+author: "Conor Tompkins"
+date: "March 9, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE,
+                      echo = FALSE,
+                      cache = TRUE)
+```
+```{r load_environment}
+library(tidyverse)
+library(tidytext)
+library(lubridate)
+library(rtweet)
+library(scales)
+library(knitr)
+library(kableExtra)
+
+
+set.seed(1234)
+theme_set(theme_bw(base_size = 18))
+
+title <- "@SenBobCasey and @SenToomey tweets"
+caption <- "@conor_tompkins"
+```
+
+##Bigram analysis
+```{r load_functions_and_data}
+source("https://raw.githubusercontent.com/conorotompkins/pittsburgh_twitter/master/scripts/tidytext_functions.R")
+
+df_casey <- read_csv("https://raw.githubusercontent.com/conorotompkins/pittsburgh_twitter/master/data/tweets_casey.tweets.csv")
+
+df_toomey <- read_csv("https://raw.githubusercontent.com/conorotompkins/pittsburgh_twitter/master/data/tweets_toomey.tweets.csv")
+
+df_casey[1:5, 1:5] %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r munge_casey_tweets}
+casey_stopwords <- c("0085", "009f", "f0", "00a6")
+casey_replacers <- c("'s")
+tweets_casey <- count_twitter_bigrams(df_casey, custom_stopwords = casey_stopwords)
+
+tweets_casey %>% 
+  rename(count = n) %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r visualize_casey_bigrams}
+visualize_bigrams(tweets_casey, 15,
+                  title = "@SenBobCasey tweets",
+                  subtitle = "Bigram network",
+                  caption = "@conor_tompkins")
+```
+
+```{r munge_toomey_tweets}
+#need to get rid of "amp" connected to "senbobcasey
+toomey_stopwords <- c("0085", "009f", "f0", "00a6")
+tweets_toomey <- count_twitter_bigrams(df_toomey, custom_stopwords = toomey_stopwords)
+                                       
+tweets_toomey %>% 
+  rename(count = n) %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r visualize_toomey_bigrams}
+visualize_bigrams(tweets_toomey, 15,
+                  title = "@SenToomey tweets",
+                  subtitle = "Bigram network",
+                  caption = "@conor_tompkins")
+```
+
+##Word correlation
+```{r word_correlation_casey}
+casey_words <- word_correlations(df_casey, minimum = 75, casey_stopwords)
+visualize_word_correlations(casey_words, 
+                            minimum_correlation = .2,
+                            title = "@SenBobCasey tweets",
+                            subtitle = "Word correlation",
+                            caption = "@conor_tompkins")
+```
+
+```{r word_correlation_toomey}
+toomey_words <- word_correlations(df_toomey, minimum = 75, casey_stopwords)
+visualize_word_correlations(toomey_words, 
+                            minimum_correlation = .2,
+                            title = "@SenToomey tweets",
+                            subtitle = "Word correlation",
+                            caption = "@conor_tompkins")
+```
+
+##Word frequency comparison
+```{r combine_tweets}
+tweets <- bind_rows(df_casey, df_toomey)
+
+replace_reg <- "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https|'s|'"
+unnest_reg <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
+
+tweets %>% 
+  select(senator, status_id, text, is_quote, is_retweet) %>% 
+  filter(is_quote == FALSE, is_retweet == FALSE) %>% 
+  mutate(text = str_replace_all(text, replace_reg, ""),
+         senator = factor(senator, levels = c("SenToomey", "SenBobCasey"))) %>% 
+  count(senator)
+```
+
+```{r munge_senators_tweets}
+tidy_tweets <- tweets %>% 
+  select(senator, status_id, text, is_quote, is_retweet) %>% 
+  mutate(text = str_replace_all(text, replace_reg, ""),
+         senator = factor(senator, levels = c("SenBobCasey", "SenToomey"))) %>%
+  unnest_tokens(word, text, token = "regex", pattern = unnest_reg) %>%
+  filter(!word %in% stop_words$word,
+         !word %in% c("009f", "00a6", "f0"),
+         str_detect(word, "[a-z]"))
+
+tidy_tweets %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r, calculate_word_frequency_1}
+frequency <- tidy_tweets %>% 
+  group_by(senator) %>% 
+  count(word, sort = TRUE) %>% 
+  left_join(tidy_tweets %>% 
+              group_by(senator) %>% 
+              summarise(total = n())) %>%
+  mutate(freq = n/total)
+
+frequency %>% 
+  rename(count = n) %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+```{r, calculate_word_frequency_12}
+frequency <- frequency %>% 
+  select(senator, word, freq) %>% 
+  spread(senator, freq) %>%
+  arrange(desc(SenBobCasey), desc(SenToomey))
+
+frequency %>% 
+  #rename(count = n) %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r plot_word_frequency}
+ggplot(frequency, aes(SenBobCasey, SenToomey)) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.25, height = 0.25) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  geom_abline(color = "red") +
+  labs(title = title,
+       x = "Used more by @SenBobCasey",
+       y = "Used more by @SenToomey",
+       caption = caption)
+```
+##Word ratios
+```{r calculate_ratios}
+word_ratios <- tidy_tweets %>%
+  filter(!str_detect(word, "^@")) %>%
+  count(word, senator) %>%
+  filter(sum(n) >= 10) %>%
+  ungroup() %>%
+  spread(senator, n, fill = 0) %>%
+  mutate_if(is.numeric, funs((. + 1) / sum(. + 1))) %>%
+  mutate(logratio = log(SenBobCasey / SenToomey)) %>%
+  arrange(desc(logratio))
+
+word_ratios %>% 
+  arrange(desc(abs(logratio))) %>%
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
+```
+
+```{r plot_ratios}
+word_ratios %>%
+  group_by(logratio < 0) %>%
+  top_n(15, abs(logratio)) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, logratio)) %>%
+  ggplot(aes(word, logratio, fill = logratio < 0)) +
+  geom_col(alpha = .8) +
+  coord_flip() +
+  labs(x = "",
+       y = "Log odds ratio (Casey/Toomey)") +
+  scale_fill_manual(name = "", 
+                    values = c("blue", "red"),
+                    breaks = c(FALSE, TRUE), 
+                    labels = c("@SenBobCasey", "@SenToomey")) +
+  theme(panel.grid.major.y = element_blank())
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
