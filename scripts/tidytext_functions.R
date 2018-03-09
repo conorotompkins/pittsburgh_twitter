@@ -83,9 +83,9 @@ word_correlations <- function(dataframe, minimum, custom_stopwords){
 #         str_detect(word, "[a-z]"))
 
 
-visualize_word_correlations <- function(dataframe, title, subtitle, caption){
+visualize_word_correlations <- function(dataframe, minimum_correlation, title, subtitle, caption){
   dataframe %>% 
-    filter(correlation > .3) %>%
+    filter(correlation > minimum_correlation) %>%
     graph_from_data_frame() %>%
     ggraph(layout = "fr") +
     geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), show.legend = FALSE) +
