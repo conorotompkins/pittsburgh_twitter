@@ -77,6 +77,15 @@ ggplot(frequency, aes(SenBobCasey, SenToomey)) +
        y = "Used more by @SenToomey",
        caption = caption)
 
+#test plot
+ggplot(frequency, aes(SenBobCasey, SenToomey)) +
+  stat_density2d(aes(fill = ..density..^.005), geom = "tile", contour = FALSE, n = 500) +
+  geom_point(alpha = 0.1, shape = 20) +
+  scale_fill_continuous(low = "white", high = "dodgerblue4") +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  coord_equal()
+
 word_ratios <- tidy_tweets %>%
   filter(!str_detect(word, "^@")) %>%
   count(word, senator) %>%
