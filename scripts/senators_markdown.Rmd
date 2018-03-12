@@ -1,5 +1,5 @@
 ---
-title: "Comparing Senators Casey and Toomey"
+title: "Comparing senators Casey and Toomey"
 author: "Conor Tompkins"
 date: "March 9, 2018"
 output: html_document
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(warning = FALSE,
 ```
 
 ##Text analysis
-As a follow-up to my post about how [Pittsburgh Mayor Bill Peduto uses Twitter](add link), I thought it would be useful to examine and compare how Pennsylvania's senators use Twitter. I will be using some of the same methods, in addition to some comparative methods.
+As a follow-up to my post about how [Pittsburgh Mayor Bill Peduto uses Twitter](http://ctompkins.netlify.com/2018/03/08/mayor-billpeduto-tweets/), I thought it would be useful to examine and compare how Pennsylvania's senators use Twitter. I will be using some of the same methods, in addition to some comparative methods.
 
 This code loads the libraries requires for the analysis, and sets some prefences for plotting.
 ```{r load_environment}
@@ -32,8 +32,12 @@ title <- "@SenBobCasey and @SenToomey tweets"
 caption <- "@conor_tompkins"
 ```
 This code uses the rtweet package to download the Senator's tweets:
-```{r dummy_download_tweets_code}
-#dummy_code
+```{r eval=FALSE}
+#df_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
+#  mutate(senator = "Casey")
+
+#df_toomey <- get_timelines("SenToomey", n = 3200) %>% 
+#  mutate(senator = "Toomey")
 ```
 This code downloads the tweet data from my [GitHub repo](insert url).
 ```{r load_functions_and_data}
@@ -49,7 +53,7 @@ df_casey[1:5, 1:5] %>%
 ```
 
 ##Bigram analysis
-Bigrams are two-word chunks pulled from text. For example, "Senator-Casey", "Casey-is", "is-from", and "from-Pennsylvania" are all bigrams of the sentence "Senator Casey is from Pennsylania". This code extracts the bigrams from Senator Casey's tweets and counts how many times they occur.
+Bigrams are two-word chunks pulled from text. For example, "Senator Casey", "Casey is", "is from", and "from Pennsylvania" are all bigrams of the sentence "Senator Casey is from Pennsylania". This code extracts the bigrams from Senator Casey's tweets and counts how many times they occur. It also removes some artifacts of URLs and other Twitter metadata that are not relevant.
 ```{r extract_bigrams_casey_tweets}
 casey_stopwords <- c("0085", "009f", "f0", "00a6")
 casey_replacers <- c("'s")
@@ -86,11 +90,12 @@ visualize_bigrams(tweets_toomey, 15,
                   subtitle = "Bigram network",
                   caption = "@conor_tompkins")
 ```
-Takeaway:
-Senator Casey uses Twitter to discuss a variety of policy issues. Senator Toomey's bigrams are less connected than Senator Casey's.
+Takeaway: Senator Casey uses Twitter to discuss a variety of policy issues. Senator Toomey's bigrams reflect that he uses Twitter to issue weekly updates and notify constituents about his newsletter.
 
 ##Word correlation
-We can also calculate and graph how the words in the tweets are correlated with each other. This code calculates and plots the correlations:
+We can also calculate and graph how the words in the tweets are correlated with each other. This code also stems the words, which combines similar words for the sake of capturing the broader usage. For example, "county" and "counties" could be stemmed into "counti".
+
+This code calculates and plots the correlations:
 ```{r word_correlation_casey, fig.width=12, fig.height=12}
 casey_words <- word_correlations(df_casey, minimum = 75, casey_stopwords)
 visualize_word_correlations(casey_words, 
@@ -99,7 +104,7 @@ visualize_word_correlations(casey_words,
                             subtitle = "Word correlation",
                             caption = "@conor_tompkins")
 ```
-There are two main clusters in this graph, about the tax cut bill and the effort to repeal the ACA.
+Takeaway: The two main clusters in this graph show that Senator Casey used a consistent vocabulary to discuss the tax cut bill and the effort to repeal the ACA.
 
 This code calculates and plots the correlations for Senator Toomey's tweets:
 ```{r word_correlation_toomey, fig.width=12, fig.height=12}
@@ -110,10 +115,10 @@ visualize_word_correlations(toomey_words,
                             subtitle = "Word correlation",
                             caption = "@conor_tompkins")
 ```
-This plot shows that Senator Toomey's tweets focus very heavily on tax cuts.
+Takeaway: This plot shows that Senator Toomey used a consistent vocabulary to discuss his main policy goal, the tax cut bill.
 
 ##Word frequency comparison
-We can also compare how frequently the Senators use various words. To set a baseline, Senator Toomey tweeted around 800 more times than Senator Casey in this sample of their tweets.
+We can also compare how frequently the senators use various words. To set a baseline, Senator Toomey tweeted around 800 more times than Senator Casey in this sample of their tweets.
 ```{r combine_tweets}
 tweets <- bind_rows(df_casey, df_toomey)
 
@@ -125,7 +130,11 @@ tweets %>%
   filter(is_quote == FALSE, is_retweet == FALSE) %>% 
   mutate(text = str_replace_all(text, replace_reg, ""),
          senator = factor(senator, levels = c("SenToomey", "SenBobCasey"))) %>% 
-  count(senator)
+  count(senator) %>% 
+  rename(count = n) %>% 
+  head() %>% 
+  kable("html") %>% 
+  kable_styling()
 ```
 This code breaks the tweets down into single words:
 ```{r munge_senators_tweets}
@@ -184,7 +193,7 @@ ggplot(frequency, aes(SenBobCasey, SenToomey)) +
        y = "Used more by @SenToomey",
        caption = caption)
 ```
-Senator Toomey was more likely to use words like "debt", "crime", "spending", and "abuse". Senator Casey used words like "coverage", "healthcare", "age", and "premiums".
+Takeaway: Senator Toomey was more likely to use words like "debt", "crime", "spending", and "abuse". Senator Casey was more likely to use words like "coverage", "healthcare", "age", and "premiums".
 
 ##Word ratios
 We can also directly compare how often each senator used a word. This code calculates that differece. The higher the log ratio, the greater the difference in how often each senator used the word.
@@ -225,4 +234,4 @@ word_ratios %>%
                     labels = c("@SenBobCasey", "@SenToomey")) +
   theme(panel.grid.major.y = element_blank())
 ```
-This plot shows the stark divide between how each senator views some of the major policy issues. Senator Casey directly criticized the problems he saw during the tax cut and ACA fight ("trumpcare", "scheme", "lose", "decimate", "sabotage"). Senator Toomey appeals to his constituents' sense of patriotism ("officer", "#vets", "#gettysburg", "lincoln").
+Takeaway: This plot shows the stark divide between how each senator views some of the major policy issues. Senator Casey directly criticized the problems he saw during the tax cut and ACA fight ("trumpcare", "scheme", "lose", "decimate", "sabotage"). Senator Toomey appeals to his constituents' sense of patriotism ("officer", "#vets", "#gettysburg", "lincoln"), and framed the tax cut bill as "#taxreform".
