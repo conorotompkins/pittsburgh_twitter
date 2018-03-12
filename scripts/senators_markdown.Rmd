@@ -1,7 +1,7 @@
 ---
-title: "Comparing senators Casey and Toomey"
+title: "Comparing Senators Casey and Toomey"
 author: "Conor Tompkins"
-date: "March 9, 2018"
+date: "March 12, 2018"
 output: html_document
 runtime: shiny
 ---
@@ -33,11 +33,11 @@ caption <- "@conor_tompkins"
 ```
 This code uses the rtweet package to download the senator's tweets via the Twitter API:
 ```{r eval=FALSE}
-#df_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
-#  mutate(senator = "Casey")
+df_casey <- get_timelines("SenBobCasey", n = 3200) %>% 
+  mutate(senator = "Casey")
 
-#df_toomey <- get_timelines("SenToomey", n = 3200) %>% 
-#  mutate(senator = "Toomey")
+df_toomey <- get_timelines("SenToomey", n = 3200) %>% 
+  mutate(senator = "Toomey")
 ```
 I have already pulled the data from Twitter, so this code downloads the tweet data from my [GitHub repo](https://github.com/conorotompkins/pittsburgh_twitter).
 ```{r load_functions_and_data}
